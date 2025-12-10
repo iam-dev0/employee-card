@@ -92,20 +92,27 @@ export async function generateMetadata({ params, searchParams }) {
         creator: fullName,
         publisher: company || 'Digital Business Card',
         
-        // Open Graph metadata for social sharing
+        // Open Graph metadata for social sharing (Slack uses this)
         openGraph: {
             title,
             description,
             type: 'profile',
+            url: `https://employee-card-os32.vercel.app/card/${id}?template=${template}`,
+            siteName: 'Digital Business Cards',
             images: cardData.image || cardData.imageUrl ? [
                 {
                     url: cardData.image || cardData.imageUrl,
-                    width: 800,
-                    height: 600,
+                    width: 1200,
+                    height: 630,
                     alt: `${fullName} - Professional Photo`,
+                    type: 'image/jpeg',
                 }
-            ] : [],
-            siteName: 'Digital Business Cards',
+            ] : [{
+                url: 'https://employee-card-os32.vercel.app/api/og?name=' + encodeURIComponent(fullName) + '&role=' + encodeURIComponent(role),
+                width: 1200,
+                height: 630,
+                alt: `${fullName} - Digital Business Card`,
+            }],
         },
         
         // Twitter Card metadata
@@ -130,8 +137,17 @@ export async function generateMetadata({ params, searchParams }) {
             },
         },
         
-        // Structured data
+        // Additional meta tags for better social sharing
         other: {
+            'og:title': title,
+            'og:description': description,
+            'og:image': cardData.image || cardData.imageUrl || `https://employee-card-os32.vercel.app/api/og?name=${encodeURIComponent(fullName)}&role=${encodeURIComponent(role)}`,
+            'og:url': `https://employee-card-os32.vercel.app/card/${id}?template=${template}`,
+            'og:type': 'profile',
+            'twitter:card': 'summary_large_image',
+            'twitter:title': title,
+            'twitter:description': description,
+            'twitter:image': cardData.image || cardData.imageUrl,
             'application/ld+json': JSON.stringify(structuredData),
         },
     };
