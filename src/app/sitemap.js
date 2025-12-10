@@ -1,6 +1,4 @@
-import { MetadataRoute } from 'next'
- 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default function sitemap() {
     const baseUrl = 'https://me.onra.ch' // Replace with your actual domain
     
     // Static routes
@@ -20,15 +18,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ]
     
     // You can add dynamic card routes here if you have a list of card IDs
-    // const cardRoutes = cardIds.map((id) => ({
-    //     url: `${baseUrl}/card/${id}`,
-    //     lastModified: new Date(),
-    //     changeFrequency: 'weekly',
-    //     priority: 0.7,
-    // }))
+    const cardRoutes = [
+        '68757392fb1a16b8eb2a4ba9',
+        // Add more card IDs as needed
+    ].map((id) => ({
+        url: `${baseUrl}/card/${id}`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly',
+        priority: 0.7,
+    }))
     
     return [
         ...staticRoutes,
-        // ...cardRoutes,
+        ...cardRoutes,
     ]
 }
