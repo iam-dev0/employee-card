@@ -1,3 +1,4 @@
+// app/card/[id]/page.js
 import { Suspense } from 'react';
 import CardViewer from '@/components/CardViewer';
 import { notFound } from 'next/navigation';
@@ -32,8 +33,8 @@ async function getCardData(id) {
 
 // Generate metadata for SEO
 export async function generateMetadata({ params, searchParams }) {
-    const { id } = await params;
-    const template = (await searchParams)?.template || 'glass';
+    const { id } = await params; // params is a promise
+    const template = searchParams?.template || 'glass'; // searchParams is NOT a promise
     
     const cardData = await getCardData(id);
     
@@ -47,81 +48,75 @@ export async function generateMetadata({ params, searchParams }) {
     const fullName = `${cardData.firstname || cardData.firstName || ''} ${cardData.name || cardData.lastName || ''}`.trim();
     const role = cardData.role || '';
     const company = cardData.companyName || '';
+    const about = cardData.aboutEN || cardData.aboutDE || '';
     
-    const title = fullName 
-        ? `${fullName}${role ? ` - ${role}` : ''}${company ? ` at ${company}` : ''} | Digital Business Card`
-        : 'Digital Business Card';
-        
-    const description = cardData.aboutEN || cardData.aboutDE || 
-        `Connect with ${fullName}${role ? `, ${role}` : ''}${company ? ` at ${company}` : ''}. View contact information, professional details, and connect instantly through this digital business card.`;
+    // Create page title
+    let title = fullName || 'Digital Business Card';
+    if (role) title += ` - ${role}`;
+    if (company) title += ` at ${company}`;
+    title += ' | Digital Business Card';
+    
+    // Create description
+    let description = about;
+    if (!description && fullName) {
+        description = `Connect with ${fullName}${role ? `, ${role}` : ''}${company ? ` at ${company}` : ''}. View contact information, professional details, and connect instantly through this digital business card.`;
+    }
+    
+    // Get image URL
+    const imageUrl = cardData.image || cardData.imageUrl || cardData.profileImage;
+    const ogImageUrl = imageUrl 
+        ? imageUrl
+        : `https://employee-card-os32.vercel.app/api/og?name=${encodeURIComponent(fullName)}&role=${encodeURIComponent(role)}&company=${encodeURIComponent(company)}&template=${template}`;
 
-    // Create structured data for rich snippets
-    const structuredData = {
-        "@context": "https://schema.org",
-        "@type": "Person",
-        "name": fullName,
-        "jobTitle": role,
-        "worksFor": {
-            "@type": "Organization",
-            "name": company
-        },
-        "email": cardData.email,
-        "telephone": cardData.phone,
-        "url": cardData.website,
-        "sameAs": [
-            cardData.linkedin,
-            cardData.website
-        ].filter(Boolean),
-        "image": cardData.image || cardData.imageUrl
-    };
+    // Keywords for SEO
+    const keywords = [
+        fullName,
+        role,
+        company,
+        'business card',
+        'digital card',
+        'contact information',
+        'professional profile',
+        'networking'
+    ].filter(Boolean);
 
     return {
         title,
-        description,
-        keywords: [
-            fullName,
-            role,
-            company,
-            'business card',
-            'digital card',
-            'contact information',
-            'professional profile',
-            'networking'
-        ].filter(Boolean).join(', '),
+        description: description.substring(0, 160), // Limit to 160 chars for SEO
+        keywords: keywords.join(', '),
         authors: [{ name: fullName }],
         creator: fullName,
         publisher: company || 'Digital Business Card',
         
-        // Open Graph metadata for social sharing (Slack uses this)
+        // Open Graph metadata for social sharing
         openGraph: {
             title,
-            description,
+            description: description.substring(0, 150),
             type: 'profile',
             url: `https://employee-card-os32.vercel.app/card/${id}?template=${template}`,
             siteName: 'Digital Business Cards',
-            images: cardData.image || cardData.imageUrl ? [
-                {
-                    url: cardData.image || cardData.imageUrl,
-                    width: 1200,
-                    height: 630,
-                    alt: `${fullName} - Professional Photo`,
-                    type: 'image/jpeg',
-                }
-            ] : [{
-                url: 'https://employee-card-os32.vercel.app/api/og?name=' + encodeURIComponent(fullName) + '&role=' + encodeURIComponent(role),
+            images: [{
+                url: ogImageUrl,
                 width: 1200,
                 height: 630,
-                alt: `${fullName} - Digital Business Card`,
+                alt: `${fullName} - ${role} at ${company}`,
             }],
+            profile: {
+                firstName: cardData.firstname || cardData.firstName,
+                lastName: cardData.name || cardData.lastName,
+                username: cardData.email?.split('@')[0],
+            },
         },
         
         // Twitter Card metadata
         twitter: {
             card: 'summary_large_image',
             title,
-            description,
-            images: cardData.image || cardData.imageUrl ? [cardData.image || cardData.imageUrl] : [],
-            creator: cardData.linkedin ? `@${cardData.linkedin.split('/').pop()}` : undefined,
+            description: description.substring(0, 150),
+            images: [ogImageUrl],
+            creator: cardData.twitter 
+                ? `@${cardData.twitter.replace('@', '').split('/').pop()}`
+                : fullName,
         },
         
         // Additional metadata
@@ -137,25 +132,16 @@ export async function generateMetadata({ params, searchParams }) {
             },
         },
         
-        // Additional meta tags for better social sharing
-        other: {
-            'og:title': title,
-            'og:description': description,
-            'og:image': cardData.image || cardData.imageUrl || `https://employee-card-os32.vercel.app/api/og?name=${encodeURIComponent(fullName)}&role=${encodeURIComponent(role)}`,
-            'og:url': `https://employee-card-os32.vercel.app/card/${id}?template=${template}`,
-            'og:type': 'profile',
-            'twitter:card': 'summary_large_image',
-            'twitter:title': title,
-            'twitter:description': description,
-            'twitter:image': cardData.image || cardData.imageUrl,
-            'application/ld+json': JSON.stringify(structuredData),
+        // Additional meta tags
+        alternates: {
+            canonical: `https://employee-card-os32.vercel.app/card/${id}`,
         },
     };
 }
 
 export default async function CardPage({ params, searchParams }) {
     const { id } = await params;
-    const template = (await searchParams)?.template || 'glass';
+    const template = searchParams?.template || 'glass';
     const cardData = await getCardData(id);
     
     if (!cardData) {
@@ -163,15 +149,43 @@ export default async function CardPage({ params, searchParams }) {
         notFound();
     }
 
+    // Prepare structured data for the page
+    const fullName = `${cardData.firstname || cardData.firstName || ''} ${cardData.name || cardData.lastName || ''}`.trim();
+    const structuredData = {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": fullName,
+        "jobTitle": cardData.role || '',
+        "worksFor": {
+            "@type": "Organization",
+            "name": cardData.companyName || ''
+        },
+        "email": cardData.email,
+        "telephone": cardData.phone,
+        "url": cardData.website,
+        "sameAs": [
+            cardData.linkedin,
+            cardData.twitter,
+            cardData.github,
+            cardData.website
+        ].filter(Boolean),
+        "image": cardData.image || cardData.imageUrl,
+        "description": cardData.aboutEN || cardData.aboutDE || ''
+    };
+
     return (
         <main className="min-h-screen">
+            {/* Add structured data script */}
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+            />
+            
             <Suspense fallback={
                 <div className="flex items-center justify-center min-h-screen">
                     <div className="flex flex-col items-center gap-4">
-                        <svg className="animate-spin h-10 w-10 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
+                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+                        <p className="text-gray-600">Loading card...</p>
                     </div>
                 </div>
             }>
@@ -181,5 +195,8 @@ export default async function CardPage({ params, searchParams }) {
     );
 }
 
+
+
 // Configure page to be dynamic
 export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // Revalidate every hour
