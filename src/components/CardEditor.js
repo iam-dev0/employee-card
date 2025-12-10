@@ -15,10 +15,11 @@ const TEMPLATES = [
 
 const CardEditor = forwardRef((_, ref) => {
     const searchParams = useSearchParams();
-    const initialTemplate = searchParams.get('template') || 'original';
+    const initialTemplate = searchParams.get('template') || 'glass';
     const [selectedTemplateId, setSelectedTemplateId] = useState(initialTemplate);
     const [templateData, setTemplateData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [cardId] = useState('68757392fb1a16b8eb2a4ba9'); // Default card ID for editor
 
     const fetchTemplates = async () => {
         try {
@@ -29,6 +30,19 @@ const CardEditor = forwardRef((_, ref) => {
             console.error("Failed to fetch template data", error);
         } finally {
             setIsLoading(false);
+        }
+    };
+    
+    const generateShareableLink = () => {
+        const baseUrl = window.location.origin;
+        const shareUrl = `${baseUrl}/card/${cardId}?template=${selectedTemplateId}`;
+        
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                alert('Shareable link copied to clipboard!');
+            });
+        } else {
+            alert(`Shareable link: ${shareUrl}`);
         }
     };
     useEffect(() => {
@@ -60,6 +74,20 @@ const CardEditor = forwardRef((_, ref) => {
 
     return (
         <div className="flex h-full w-full overflow-hidden relative flex-col">
+            {/* Floating Action Buttons */}
+            <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
+                <button
+                    onClick={generateShareableLink}
+                    className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition-colors flex items-center gap-2"
+                    title="Generate Shareable Link"
+                >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                    </svg>
+                    <span className="hidden sm:inline text-sm font-medium">Share</span>
+                </button>
+            </div>
+            
             <div className="h-full flex flex-1 overflow-hidden relative">
                 {/* Right Panel - Full Screen Preview */}
                 <div className="flex-1 h-full bg-background relative overflow-y-auto custom-scrollbar transition-all duration-300">
