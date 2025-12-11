@@ -1,7 +1,28 @@
 
 import { QRCodeSVG } from 'qrcode.react';
+import { forwardRef, useState } from 'react';
 
-const ProfileCard8 = ({ data }) => {
+const ProfileCard8 = forwardRef(({ data, shareWebsite, downloadPDF }, ref) => {
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
+
+  const handleDownload = async () => {
+    setIsDownloading(true);
+    try {
+      await downloadPDF();
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
+  const handleShare = async () => {
+    setIsSharing(true);
+    try {
+      await shareWebsite();
+    } finally {
+      setIsSharing(false);
+    }
+  };
     const {
         firstname: firstName = 'Linda',
         name: lastName = 'Johnson',
@@ -22,7 +43,7 @@ const ProfileCard8 = ({ data }) => {
     const qrLink = qrCodeLink || (typeof window !== 'undefined' ? window.location.href : '');
 
     return (
-        <section className="min-h-screen flex bg-[#455fac] items-center justify-center" style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '32px 32px' }}>
+        <section ref={ref} className="min-h-screen flex bg-[#455fac] items-center justify-center" style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '32px 32px' }}>
             <div className="overflow-y-auto bg-white w-full h-screen md:flex md:flex-row md:items-stretch transition-all duration-500 ease-out">
                 {/* Header Image Section */}
                 <div className="relative h-[340px] md:h-auto md:w-2/5 lg:w-5/12 group shrink-0">
@@ -97,11 +118,59 @@ const ProfileCard8 = ({ data }) => {
                         )}
 
                         {/* Secondary Action Buttons */}
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
                             {email && (
                                 <a href={`mailto:${email}`} className="group w-14 h-14 rounded-2xl bg-white/5 backdrop-blur-sm text-white flex items-center justify-center hover:bg-white/20 transition-all ">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:scale-110 transition-transform duration-300"><rect width="20" height="16" x="2" y="4" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></svg>
                                 </a>
+                            )}
+
+                            {/* Download Icon Button */}
+                            {downloadPDF && (
+                                <button
+                                    onClick={handleDownload}
+                                    disabled={isDownloading}
+                                    title={isDownloading ? 'Downloading...' : 'Download PDF'}
+                                    className="relative group w-14 h-14 rounded-2xl bg-white/5 backdrop-blur-sm text-white flex items-center justify-center hover:bg-white/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {isDownloading ? (
+                                        <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                                            <path className="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                                        </svg>
+                                    ) : (
+                                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="lucide lucide-download-icon lucide-download"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>
+                                    )}
+                                    {/* Tooltip */}
+                                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs bg-black/80 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+                                        {isDownloading ? 'Downloading...' : 'Download PDF'}
+                                    </div>
+                                </button>
+                            )}
+
+                            {/* Share Icon Button */}
+                            {shareWebsite && (
+                                <button
+                                    onClick={handleShare}
+                                    disabled={isSharing}
+                                    title={isSharing ? 'Sharing...' : 'Share'}
+                                    className="relative group w-14 h-14 rounded-2xl bg-white/5 backdrop-blur-sm text-white flex items-center justify-center hover:bg-white/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {isSharing ? (
+                                        <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                                            <path className="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                                        </svg>
+                                    ) : (
+                                        <svg className="h-5 w-5 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                                        </svg>
+                                    )}
+                                    {/* Tooltip */}
+                                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs bg-black/80 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+                                        {isSharing ? 'Sharing...' : 'Share'}
+                                    </div>
+                                </button>
                             )}
                         </div>
                     </div>
@@ -176,6 +245,6 @@ const ProfileCard8 = ({ data }) => {
             </div>
         </section>
     );
-};
+});
 
 export default ProfileCard8;

@@ -1,6 +1,27 @@
 import { QRCodeSVG } from 'qrcode.react';
+import { forwardRef, useState } from 'react';
 
-const ProfileCard7 = ({ data }) => {
+const ProfileCard7 = forwardRef(({ data, shareWebsite, downloadPDF }, ref) => {
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
+
+  const handleDownload = async () => {
+    setIsDownloading(true);
+    try {
+      await downloadPDF();
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
+  const handleShare = async () => {
+    setIsSharing(true);
+    try {
+      await shareWebsite();
+    } finally {
+      setIsSharing(false);
+    }
+  };
   const {
     firstname: firstName = 'Kevin',
     name: lastName = 'Johnson',
@@ -17,12 +38,17 @@ const ProfileCard7 = ({ data }) => {
     qrCodeLink = '',
     aboutDE = '',
     aboutEN = '',
+    footerCompany = "onra GmbH",
+    footerAddress = "Ägeristrasse 112, 6300 Zug",
+    footerEmail = "info@onra.ch",
+    footerPhone = "+41 796 36 65 93"
   } = data;
 
   const qrLink = qrCodeLink || (typeof window !== 'undefined' ? window.location.href : '');
 
+
   return (
-    <div className="h-[100dvh] w-full bg-[#0f3227] flex flex-col relative font-sans text-white selection:bg-[#ff5722] selection:text-white overflow-hidden md:overflow-hidden overflow-y-auto">
+    <div ref={ref} className="h-[100dvh] w-full bg-[#0f3227] flex flex-col relative font-sans text-white selection:bg-[#ff5722] selection:text-white overflow-hidden md:overflow-hidden overflow-y-auto">
       {/* Background Grid Lines - Fixed to viewport */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="w-full h-full max-w-[1920px] mx-auto grid grid-cols-1 md:grid-cols-3 border-x border-white/5 relative">
@@ -52,11 +78,35 @@ const ProfileCard7 = ({ data }) => {
         </div>
         <div className="p-4 flex items-start justify-between md:justify-start md:gap-4 ">
           <div className="flex items-center gap-3">
+            {/* Download Icon */}
+            <button
+              onClick={handleDownload}
+              disabled={isDownloading}
+              className="relative group cursor-pointer w-8 h-8 rounded-full bg-white/10 hover:bg-[#e64a19] text-white flex items-center justify-center transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Download PDF"
+            >
+              {isDownloading ? (
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="lucide lucide-download-icon lucide-download"><path d="M12 15V3" /><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><path d="m7 10 5 5 5-5" /></svg>
 
-            <span className="font-medium text-sm">{companyName}</span>
-            <div className='flex items-center justify-center w-10 h-10 rounded-[4px] bg-white'>
-              <svg xmlns="http://www.w3.org/2000/svg" className='w-6 h-6' width="24" height="24" viewBox="0 0 24 24" fill="#0f3227" stroke="#0f3227" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-linkedin-icon lucide-linkedin"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" /><rect width="4" height="12" x="2" y="9" /><circle cx="4" cy="4" r="2" /></svg>
-            </div>
+              )}
+            </button>
+
+            {/* Share Icon */}
+            <button
+              onClick={handleShare}
+              disabled={isSharing}
+              className="relative group cursor-pointer w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm"
+            >
+              {isSharing ? (
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              ) : (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                </svg>
+              )}
+            </button>
           </div>
           {/* Mobile Menu Icon (Visible only on mobile) */}
         </div>
@@ -118,7 +168,7 @@ const ProfileCard7 = ({ data }) => {
               {/* Floating Button: Get In Touch */}
               {/* <button
                 className="absolute top-8 -right-18 sm:-right-18 md:-right-12  bg-[#ff5722] text-white pl-5 pr-6 py-3.5 rounded-xl shadow-lg flex items-center gap-3 z-30 group cursor-pointer border border-transparent hover:border-white/20" >
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-corner-down-right-icon lucide-corner-down-right"><path d="m15 10 5 5-5 5" /><path d="M4 4v7a4 4 0 0 0 4 4h12" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="lucide lucide-corner-down-right-icon lucide-corner-down-right"><path d="m15 10 5 5-5 5" /><path d="M4 4v7a4 4 0 0 0 4 4h12" /></svg>
                 <span className="font-medium text-sm whitespace-nowrap">Get in Touch</span>
               </button> */}
             </div>
@@ -155,7 +205,7 @@ const ProfileCard7 = ({ data }) => {
               {phone && (
                 <div className="flex items-center gap-4 text-white/90 hover:text-[#ff5722] transition-colors cursor-pointer group">
                   <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-[#ff5722]/20 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" className='w-4 h-4' width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone-icon lucide-phone"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384" /></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" className='w-4 h-4' width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="lucide lucide-phone-icon lucide-phone"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384" /></svg>
                   </div>
                   <span className="text-sm md:text-base">{phone}</span>
                 </div>
@@ -164,7 +214,7 @@ const ProfileCard7 = ({ data }) => {
               {email && (
                 <div className="flex items-center gap-4 text-white/90 hover:text-[#ff5722] transition-colors cursor-pointer group">
                   <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-[#ff5722]/20 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" className='w-4 h-4' viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mail-icon lucide-mail"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7" /><rect x="2" y="4" width="20" height="16" rx="2" /></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" className='w-4 h-4' viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="lucide lucide-mail-icon lucide-mail"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7" /><rect x="2" y="4" width="20" height="16" rx="2" /></svg>
                   </div>
                   <a href={`mailto:${email}`} className="text-sm md:text-base">{email}</a>
                 </div>
@@ -172,7 +222,7 @@ const ProfileCard7 = ({ data }) => {
               {linkedin && (
                 <div className="flex items-center gap-4 text-white/90 hover:text-[#ff5722] transition-colors cursor-pointer group">
                   <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-[#ff5722]/20 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" className='w-4 h-4' width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-linkedin-icon lucide-linkedin"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" /><rect width="4" height="12" x="2" y="9" /><circle cx="4" cy="4" r="2" /></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" className='w-4 h-4' width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="lucide lucide-linkedin-icon lucide-linkedin"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" /><rect width="4" height="12" x="2" y="9" /><circle cx="4" cy="4" r="2" /></svg>
                   </div>
                   <a href={linkedin} target="_blank" rel="noopener noreferrer" className="text-sm md:text-base">linkedin</a>
                 </div>
@@ -181,21 +231,18 @@ const ProfileCard7 = ({ data }) => {
               {website && (
                 <div className="flex items-center gap-4 text-white/90 hover:text-[#ff5722] transition-colors cursor-pointer group">
                   <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-[#ff5722]/20 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" className='w-4 h-4' width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-globe-icon lucide-globe"><circle cx="12" cy="12" r="10" /><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" /><path d="M2 12h20" /></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" className='w-4 h-4' width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="lucide lucide-globe-icon lucide-globe"><circle cx="12" cy="12" r="10" /><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" /><path d="M2 12h20" /></svg>
                   </div>
                   <span className="text-sm md:text-base truncate">{website}</span>
                 </div>
               )}
             </div>
+
+            {/* Action Icons - In Contact Section */}
+
+
             {/* Company & QR */}
-            <div className="flex items-center gap-6 w-full max-w-sm justify-center md:justify-start">
-              {/* QR Code */}
-              {qrLink && (
-                <div className="bg-white p-2 rounded-lg shrink-0">
-                  <QRCodeSVG value={qrLink} size={80} />
-                </div>
-              )}
-            </div>
+
 
           </div>
         </div>
@@ -203,16 +250,70 @@ const ProfileCard7 = ({ data }) => {
         {/* Bottom Section: Massive Name (Desktop Only) */}
         <div className="hidden md:block w-full relative z-20 pb-0 shrink-0">
           <h1
-            className="text-[10.5vw] leading-[0.8] font-display font-bold text-white tracking-tighter text-center select-none"
-            style={{ marginBottom: "3vw" }}
+            className="text-[8vw] leading-[0.8] font-display font-bold text-white tracking-tighter text-center select-none"
+            style={{ marginBottom: "1.5vw" }}
           >
             {firstName} {lastName}
           </h1>
         </div>
       </main>
+
+      {/* Footer */}
+      <footer className="bg-[#0f3227] py-4 relative z-20 text-white shrink-0">
+        <div className="mx-auto px-6">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+            <div className='flex gap-4'>
+              {/* QR Code */}
+              {qrLink && (
+                <div className='flex gap-2'>
+                  <div className="bg-white p-2 rounded-lg shrink-0">
+                    <QRCodeSVG value={qrLink} size={80} />
+
+                  </div>
+
+                </div>
+
+              )}
+              <div className="gap-4 space-y-4">
+                <div>
+                  <p className="text-base font-bold text-white mb-1 font-display tracking-wide">{footerCompany}</p>
+                  <p className="text-white/40  text-sm">{footerAddress}</p>
+                </div>
+
+                <div className="space-y-1 text-white/40 text-xs">
+                  <p>E-Mail: <a href={`mailto:${footerEmail}`} className="text-white hover:text-[#ff5722] transition-colors">{footerEmail}</a></p>
+                  <p>Telefon: <a href={`tel:${footerPhone?.replace(/\s/g, '')}`} className="text-white hover:text-[#ff5722] transition-colors">{footerPhone}</a></p>
+                </div>
+              </div>
+            </div>
+
+
+            <div className="flex flex-col md:items-end gap-4 w-full md:w-auto">
+              <div className="flex items-center gap-4">
+                <a href={linkedin} className="text-white hover:text-[#ff5722] transition-colors bg-white/5 p-2 rounded-full hover:bg-white/10">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" /><rect width="4" height="12" x="2" y="9" /><circle cx="4" cy="4" r="2" /></svg>
+                </a>
+              </div>
+
+              <div className="text-left md:text-right w-full">
+                <div className="flex gap-3 text-xs text-white/40  mb-2 justify-start md:justify-end uppercase tracking-wider">
+                  <a href="#" className="hover:text-white transition-colors">Datenschutz</a>
+                  <span>|</span>
+                  <a href="#" className="hover:text-white transition-colors">AGB</a>
+                  <span>|</span>
+                  <a href="#" className="hover:text-white transition-colors">Impressum</a>
+                </div>
+                <p className="text-xs text-white/40">© {new Date().getFullYear()} {footerCompany}. Alle Rechte vorbehalten.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
-};
+});
+
+ProfileCard7.displayName = 'ProfileCard7';
 
 export default ProfileCard7;
 

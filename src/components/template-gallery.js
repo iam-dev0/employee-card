@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 const templates = [
     {
         id: 'glass',
-        imageUrl: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80",
+        imageUrl: "/profile-card1.png",
         name: 'Glassmorphism',
         description: 'Trendy frosted glass effect with colorful gradients and floating elements.',
         tags: ['Trendy', 'Modern', 'Colorful'],
@@ -14,7 +14,7 @@ const templates = [
     {
         id: 'calvino',
         name: 'Calvino Bold',
-        imageUrl: "https://images.unsplash.com/photo-1617975316514-69cd7e16c2a4?w=900&auto=format&fit=crop&q=60",
+        imageUrl: "/profile-card2.png",
         description: 'Bold orange header with overlapping avatar and large typography.',
         teamID: "68757392fb1a16b8eb2a4ba9",
         tags: ['Bold', 'Header', 'Creative']
@@ -22,7 +22,7 @@ const templates = [
     {
         id: 'freelancer',
         name: 'Freelancer Split',
-        imageUrl: "https://images.unsplash.com/photo-1541167760496-1628856ab772?w=500&q=80",
+        imageUrl: "/profile-card3.png",
         description: 'Modern split-screen design with a large image and green accents.',
         tags: ['Split', 'Freelancer', 'Modern'],
         teamID: "68757392fb1a16b8eb2a4ba9"
@@ -41,7 +41,7 @@ const ProductCard = React.forwardRef(
                 )}
                 {...props}
             >
-                <div className="aspect-square overflow-hidden">
+                <div className="aspect-[16/10] overflow-hidden rounded-t-lg">
                     <img
                         src={imageUrl}
                         alt={title}

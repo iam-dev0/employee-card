@@ -1,7 +1,29 @@
 import { motion } from "framer-motion";
 import { QRCodeSVG } from 'qrcode.react';
+import { forwardRef, useState } from 'react';
 
-export default function Home({ data }) {
+const Home = forwardRef(({ data, shareWebsite, downloadPDF }, ref) => {
+    const [isDownloading, setIsDownloading] = useState(false);
+    const [isSharing, setIsSharing] = useState(false);
+
+    const handleDownload = async () => {
+        setIsDownloading(true);
+        try {
+            await downloadPDF();
+        } finally {
+            setIsDownloading(false);
+        }
+    };
+
+    const handleShare = async () => {
+        setIsSharing(true);
+        try {
+            await shareWebsite();
+        } finally {
+            setIsSharing(false);
+        }
+    };
+
     const {
         firstname: firstName = 'Linda',
         name: lastName = 'Johnson',
@@ -32,7 +54,7 @@ export default function Home({ data }) {
     const qrLink = qrCodeLink || (typeof window !== 'undefined' ? window.location.href : '');
 
     return (
-        <div className="min-h-screen bg-[#1c1c1c] text-foreground overflow-x-hidden selection:bg-[#A3B5A5] selection:text-black font-sans">
+        <div ref={ref} className="h-[100dvh] bg-[#1c1c1c] text-foreground overflow-x-hidden selection:bg-[#A3B5A5] selection:text-black font-sans">
             {/* Navigation */}
             <nav className="fixed top-0 w-full z-50 px-6 py-6 flex justify-between items-center mix-blend-exclusion text-white">
                 <div className="flex flex-col">
@@ -209,6 +231,8 @@ export default function Home({ data }) {
                                 </a>}
 
                             </div>
+
+                            
                         </div>
                     </div>
                 </div>
@@ -246,6 +270,68 @@ export default function Home({ data }) {
                             </p>
                         </motion.div>
                     </div>
+                     <div className="flex flex-col items-center text-center space-y-8 max-w-2xl mx-auto">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            whileInView={{ opacity: 1, scale: 1 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.6 }}
+                            className="relative mt-8 flex items-center justify-center gap-4"
+                        >
+                            {(shareWebsite || downloadPDF) && (
+<div className="mt-8 flex items-center justify-center gap-4">
+                                    {downloadPDF && (
+                                        <div className="group relative">
+                                            <button
+                                                onClick={handleDownload}
+                                                disabled={isDownloading}
+                                                className="cursor-pointer flex items-center justify-center w-14 h-14 bg-[#A3B5A5]/20 backdrop-blur-sm text-[#A3B5A5] hover:bg-[#A3B5A5]/30 transition-all duration-300 border border-[#A3B5A5]/30 hover:border-[#A3B5A5] hover:scale-110 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
+                                            >
+                                                {isDownloading ? (
+                                                    <svg className="animate-spin h-6 w-6" viewBox="0 0 24 24">
+                                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                                                        <path className="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                                                    </svg>
+                                                ) : (
+
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 group-hover:scale-110 transition-transform" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="lucide lucide-download-icon lucide-download"><path d="M12 15V3" /><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><path d="m7 10 5 5 5-5" /></svg>
+
+                                                )}
+                                            </button>
+                                            <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-black/80 backdrop-blur-sm text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap">
+                                                {isDownloading ? 'Downloading...' : 'Download PDF'}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {shareWebsite && (
+                                        <div className="group relative">
+                                            <button
+                                                onClick={handleShare}
+                                                disabled={isSharing}
+                                                className="cursor-pointer flex items-center justify-center w-14 h-14 bg-white/5 backdrop-blur-sm text-white hover:bg-[#A3B5A5]/20 transition-all duration-300 border border-white/10 hover:border-[#A3B5A5]/30 hover:scale-110 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
+                                            >
+                                                {isSharing ? (
+                                                    <svg className="animate-spin h-6 w-6" viewBox="0 0 24 24">
+                                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                                                        <path className="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                                                    </svg>
+                                                ) : (
+                                                    <svg className="h-6 w-6 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                                                    </svg>
+                                                )}
+                                            </button>
+                                            <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-black/80 backdrop-blur-sm text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap">
+                                                {isSharing ? 'Sharing...' : 'Share'}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </motion.div>
+                    </div>
+                   
                 </div>
             </section>}
 
@@ -290,4 +376,5 @@ export default function Home({ data }) {
             </footer>
         </div>
     );
-}
+})
+export default Home
