@@ -1,12 +1,10 @@
 'use client';
 
-import { useState, forwardRef, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import {  forwardRef } from 'react';
 
-import ProfileCard3 from './templates/ProfileCard3';
-import ProfileCard7 from './templates/ProfileCard7';
-import ProfileCard8 from './templates/ProfileCard8';
-import { Button } from './ui/button';
+import ProfileCard3 from './templates/profile-card1';
+import ProfileCard7 from './templates/profile-card2';
+import ProfileCard8 from './templates/profile-card3';
 
 const TEMPLATES = [
     { id: 'glass', name: 'Glassmorphism', component: ProfileCard3 },
