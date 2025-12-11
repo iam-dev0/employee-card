@@ -49,7 +49,8 @@ export async function generateMetadata({ params, searchParams }) {
     const role = cardData.role || '';
     const company = cardData.companyName || '';
     const about = cardData.aboutEN || cardData.aboutDE || '';
-    
+    const parser = new DOMParser();
+const doc = parser.parseFromString(about, 'text/html');
     // Create page title
     let title = fullName || 'Digital Business Card';
     if (role) title += ` - ${role}`;
@@ -57,7 +58,7 @@ export async function generateMetadata({ params, searchParams }) {
     title += ' | Digital Business Card';
     
     // Create description
-    let description = about;
+    let description = doc.body.textContent || about || '';
     if (!description && fullName) {
         description = `Connect with ${fullName}${role ? `, ${role}` : ''}${company ? ` at ${company}` : ''}. View contact information, professional details, and connect instantly through this digital business card.`;
     }
