@@ -64,7 +64,7 @@ export async function generateMetadata({ params, searchParams }) {
     
     // Get image URL
     const imageUrl = cardData.image || cardData.imageUrl || cardData.profileImage;
-    const ogImageUrl = imageUrl 
+    const ogImageUrl = "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80" || imageUrl 
         ? imageUrl
         : `https://employee-card-os32.vercel.app/api/og?name=${encodeURIComponent(fullName)}&role=${encodeURIComponent(role)}&company=${encodeURIComponent(company)}&template=${template}`;
 
