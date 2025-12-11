@@ -1,6 +1,6 @@
 // app/card/[id]/page.js
 import { Suspense } from 'react';
-import CardViewer from '@/components/CardViewer';
+import CardViewer from '@/components//card-viewer';
 import { notFound } from 'next/navigation';
 
 // Fetch data server-side
