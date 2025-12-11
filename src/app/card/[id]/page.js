@@ -34,7 +34,8 @@ async function getCardData(id) {
 // Generate metadata for SEO
 export async function generateMetadata({ params, searchParams }) {
     const { id } = await params; // params is a promise
-    const template = searchParams?.template || 'glass'; // searchParams is NOT a promise
+    const resolvedSearchParams = await searchParams; // Fix: await searchParams
+    const template = resolvedSearchParams?.template || 'glass';
     
     const cardData = await getCardData(id);
     
@@ -77,10 +78,6 @@ export async function generateMetadata({ params, searchParams }) {
     if (!description && fullName) {
         description = `Connect with ${fullName}${role ? `, ${role}` : ''}${company ? ` at ${company}` : ''}. View contact information, professional details, and connect instantly through this digital business card.`;
     }
-    
-    // Generate dynamic card image with contact details
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://employee-card-os32.vercel.app';
-    const ogImageUrl = `${baseUrl}/api/card-image?id=${id}&template=${template}`;
 
     // Keywords for SEO
     const keywords = [
@@ -109,12 +106,7 @@ export async function generateMetadata({ params, searchParams }) {
             type: 'profile',
             url: `https://employee-card-os32.vercel.app/card/${id}?template=${template}`,
             siteName: 'Digital Business Cards',
-            images: [{
-                url: ogImageUrl,
-                width: 1200,
-                height: 630,
-                alt: `${fullName} - ${role} at ${company}`,
-            }],
+            locale: 'en_US',
             profile: {
                 firstName: cardData.firstname || cardData.firstName,
                 lastName: cardData.name || cardData.lastName,
@@ -127,7 +119,6 @@ export async function generateMetadata({ params, searchParams }) {
             card: 'summary_large_image',
             title,
             description: description.substring(0, 150),
-            images: [ogImageUrl],
             creator: cardData.twitter 
                 ? `@${cardData.twitter.replace('@', '').split('/').pop()}`
                 : fullName,
@@ -155,7 +146,8 @@ export async function generateMetadata({ params, searchParams }) {
 
 export default async function CardPage({ params, searchParams }) {
     const { id } = await params;
-    const template = searchParams?.template || 'glass';
+    const resolvedSearchParams = await searchParams;
+    const template = resolvedSearchParams?.template || 'glass';
     const cardData = await getCardData(id);
     
     if (!cardData) {
