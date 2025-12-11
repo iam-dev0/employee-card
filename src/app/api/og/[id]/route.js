@@ -18,33 +18,15 @@ async function getCardData(id) {
         return null;
     }
 }
-export async function GET(request, { params }) {
+export async function GET(request) {
     try {
         const { searchParams } = new URL(request.url);
-        const id = params.id; // Get ID from URL path
-        
+        const id = searchParams.get('id') || "";
         if (!id) {
             return new Response('Missing id parameter', { status: 400 });
         }
 
-        // Try to get card data from query params first (to avoid redundant API calls)
-        let cardData;
-        const cardDataParam = searchParams.get('data');
-        
-        if (cardDataParam) {
-            try {
-                cardData = JSON.parse(decodeURIComponent(cardDataParam));
-            } catch (e) {
-                // If parsing fails, fall back to API call
-                cardData = await getCardData(id);
-            }
-        } else {
-            cardData = await getCardData(id);
-        }
-        
-        if (!cardData) {
-            return new Response('Card not found', { status: 404 });
-        }
+        const cardData = await getCardData(id);
         const fullName = `${cardData.firstname || cardData.firstName || ''} ${cardData.name || cardData.lastName || ''}`.trim();
         const role = cardData.role || '';
         const company = cardData.companyName || '';

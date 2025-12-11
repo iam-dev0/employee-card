@@ -54,7 +54,7 @@ export async function generateMetadata({ params, searchParams }) {
     // Create OG image URL
     const imageUrl = new URL(`https://employee-card-os32.vercel.app/api/og/${id}`);
     // Optionally pass card data to avoid redundant API call
-    imageUrl.searchParams.set('data', encodeURIComponent(JSON.stringify(cardData)));
+    // imageUrl.searchParams.set('data', encodeURIComponent(JSON.stringify(cardData)));
     
     // Function to strip HTML tags and get plain text
     const stripHtml = (html) => {
