@@ -38,7 +38,7 @@ export async function generateMetadata({ params, searchParams }) {
     const template = resolvedSearchParams?.template || 'glass';
     
     const cardData = await getCardData(id);
-    const imageUrl = new URL(`https://employee-card-os32.vercel.app/api/og/${id}`);
+    
     if (!cardData) {
         return {
             title: 'Card Not Found',
@@ -50,6 +50,11 @@ export async function generateMetadata({ params, searchParams }) {
     const role = cardData.role || '';
     const company = cardData.companyName || '';
     const about = cardData.aboutEN || cardData.aboutDE || '';
+    
+    // Create OG image URL
+    const imageUrl = new URL(`https://employee-card-os32.vercel.app/api/og/${id}`);
+    // Optionally pass card data to avoid redundant API call
+    imageUrl.searchParams.set('data', encodeURIComponent(JSON.stringify(cardData)));
     
     // Function to strip HTML tags and get plain text
     const stripHtml = (html) => {
