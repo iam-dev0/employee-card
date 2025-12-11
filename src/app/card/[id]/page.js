@@ -78,13 +78,9 @@ export async function generateMetadata({ params, searchParams }) {
         description = `Connect with ${fullName}${role ? `, ${role}` : ''}${company ? ` at ${company}` : ''}. View contact information, professional details, and connect instantly through this digital business card.`;
     }
     
-    // Get image URL
-    const imageUrl = cardData.image || cardData.imageUrl || cardData.profileImage;
-    const ogImageUrl = "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80" 
-    
-    // || imageUrl 
-    //     ? imageUrl
-    //     : `https://employee-card-os32.vercel.app/api/og?name=${encodeURIComponent(fullName)}&role=${encodeURIComponent(role)}&company=${encodeURIComponent(company)}&template=${template}`;
+    // Generate dynamic card image with contact details
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://employee-card-os32.vercel.app';
+    const ogImageUrl = `${baseUrl}/api/card-image?id=${id}&template=${template}`;
 
     // Keywords for SEO
     const keywords = [
