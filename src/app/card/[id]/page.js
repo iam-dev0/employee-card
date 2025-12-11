@@ -8,7 +8,7 @@ async function getCardData(id) {
     try {
         console.log('Fetching card data for ID:', id);
         const response = await fetch(
-            `https://me.onra.ch/api/website-business-public/employee/digitalBusinessCard/${id}`,
+            `${process.env.NEXT_PUBLIC_COMPANY_API_URL}/employee/digitalBusinessCard/${id}`,
             {
                 // Enable ISR (Incremental Static Regeneration) for better performance
                 next: { revalidate: 3600 } // Revalidate every hour
@@ -52,7 +52,7 @@ export async function generateMetadata({ params, searchParams }) {
     const about = cardData.aboutEN || cardData.aboutDE || '';
     
     // Create OG image URL
-    const imageUrl = new URL(`https://employee-card-os32.vercel.app/api/og/${id}`);
+    const imageUrl = new URL(`${process.env.NEXT_PUBLIC_BASE_URL}/api/og/${id}`);
     // Optionally pass card data to avoid redundant API call
     // imageUrl.searchParams.set('data', encodeURIComponent(JSON.stringify(cardData)));
     
@@ -201,7 +201,7 @@ const stripHtml = (html) => {
             cardData.github,
             cardData.website
         ].filter(Boolean),
-        "image": new URL(`https://employee-card-os32.vercel.app/api/og/${id}`),
+        "image": new URL(`${process.env.NEXT_PUBLIC_BASE_URL}/api/og/${id}`),
         "description": plainTextAbout
     };
 

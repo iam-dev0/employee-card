@@ -4,7 +4,7 @@ export const runtime = 'edge';
 async function getCardData(id) {
     try {
         const response = await fetch(
-            `https://me.onra.ch/api/website-business-public/employee/digitalBusinessCard/${id}`,
+            `${process.env.NEXT_PUBLIC_COMPANY_API_URL}/employee/digitalBusinessCard/${id}`,
             { cache: 'force-cache' }
         );
 
