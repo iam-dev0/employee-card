@@ -49,8 +49,23 @@ export async function generateMetadata({ params, searchParams }) {
     const role = cardData.role || '';
     const company = cardData.companyName || '';
     const about = cardData.aboutEN || cardData.aboutDE || '';
-    const parser = new DOMParser();
-const doc = parser.parseFromString(about, 'text/html');
+    
+    // Function to strip HTML tags and get plain text
+    const stripHtml = (html) => {
+        if (!html) return '';
+        return html
+            .replace(/<[^>]*>/g, '') // Remove HTML tags
+            .replace(/&nbsp;/g, ' ') // Replace &nbsp; with space
+            .replace(/&amp;/g, '&') // Replace &amp; with &
+            .replace(/&lt;/g, '<') // Replace &lt; with <
+            .replace(/&gt;/g, '>') // Replace &gt; with >
+            .replace(/&quot;/g, '"') // Replace &quot; with "
+            .replace(/&#39;/g, "'") // Replace &#39; with '
+            .replace(/\s+/g, ' ') // Replace multiple spaces with single space
+            .trim(); // Remove leading/trailing whitespace
+    };
+    
+    const plainTextAbout = stripHtml(about);
     // Create page title
     let title = fullName || 'Digital Business Card';
     if (role) title += ` - ${role}`;
@@ -58,16 +73,18 @@ const doc = parser.parseFromString(about, 'text/html');
     title += ' | Digital Business Card';
     
     // Create description
-    let description = doc.body.textContent || about || '';
+    let description = plainTextAbout || '';
     if (!description && fullName) {
         description = `Connect with ${fullName}${role ? `, ${role}` : ''}${company ? ` at ${company}` : ''}. View contact information, professional details, and connect instantly through this digital business card.`;
     }
     
     // Get image URL
     const imageUrl = cardData.image || cardData.imageUrl || cardData.profileImage;
-    const ogImageUrl = "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80" || imageUrl 
-        ? imageUrl
-        : `https://employee-card-os32.vercel.app/api/og?name=${encodeURIComponent(fullName)}&role=${encodeURIComponent(role)}&company=${encodeURIComponent(company)}&template=${template}`;
+    const ogImageUrl = "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80" 
+    
+    // || imageUrl 
+    //     ? imageUrl
+    //     : `https://employee-card-os32.vercel.app/api/og?name=${encodeURIComponent(fullName)}&role=${encodeURIComponent(role)}&company=${encodeURIComponent(company)}&template=${template}`;
 
     // Keywords for SEO
     const keywords = [
@@ -149,7 +166,21 @@ export default async function CardPage({ params, searchParams }) {
         console.log('No card data found, calling notFound()');
         notFound();
     }
-
+const stripHtml = (html) => {
+        if (!html) return '';
+        return html
+            .replace(/<[^>]*>/g, '') // Remove HTML tags
+            .replace(/&nbsp;/g, ' ') // Replace &nbsp; with space
+            .replace(/&amp;/g, '&') // Replace &amp; with &
+            .replace(/&lt;/g, '<') // Replace &lt; with <
+            .replace(/&gt;/g, '>') // Replace &gt; with >
+            .replace(/&quot;/g, '"') // Replace &quot; with "
+            .replace(/&#39;/g, "'") // Replace &#39; with '
+            .replace(/\s+/g, ' ') // Replace multiple spaces with single space
+            .trim(); // Remove leading/trailing whitespace
+    };
+    
+    const plainTextAbout = stripHtml(cardData?.aboutEN || cardData?.aboutDE || '');
     // Prepare structured data for the page
     const fullName = `${cardData.firstname || cardData.firstName || ''} ${cardData.name || cardData.lastName || ''}`.trim();
     const structuredData = {
@@ -171,7 +202,7 @@ export default async function CardPage({ params, searchParams }) {
             cardData.website
         ].filter(Boolean),
         "image": cardData.image || cardData.imageUrl,
-        "description": cardData.aboutEN || cardData.aboutDE || ''
+        "description": plainTextAbout
     };
 
     return (
