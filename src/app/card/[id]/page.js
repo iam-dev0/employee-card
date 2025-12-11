@@ -38,7 +38,7 @@ export async function generateMetadata({ params, searchParams }) {
     const template = resolvedSearchParams?.template || 'glass';
     
     const cardData = await getCardData(id);
-    const imageUrl = `https://employee-card-os32.vercel.app/api/og/${id}`;
+    const imageUrl = new URL(`https://employee-card-os32.vercel.app/api/og/${id}`);
     if (!cardData) {
         return {
             title: 'Card Not Found',
@@ -190,7 +190,7 @@ const stripHtml = (html) => {
             cardData.github,
             cardData.website
         ].filter(Boolean),
-        "image": cardData.image || cardData.imageUrl,
+        "image": new URL(`https://employee-card-os32.vercel.app/api/og/${id}`),
         "description": plainTextAbout
     };
 
