@@ -38,7 +38,7 @@ export async function generateMetadata({ params, searchParams }) {
     const template = resolvedSearchParams?.template || 'glass';
     
     const cardData = await getCardData(id);
-    
+    const imageUrl = `https://employee-card-os32.vercel.app/api/og/${id}`;
     if (!cardData) {
         return {
             title: 'Card Not Found',
@@ -93,7 +93,7 @@ export async function generateMetadata({ params, searchParams }) {
 
     return {
         title,
-        description: description.substring(0, 160), // Limit to 160 chars for SEO
+        description: company, // Limit to 160 chars for SEO
         keywords: keywords.join(', '),
         authors: [{ name: fullName }],
         creator: fullName,
@@ -104,7 +104,7 @@ export async function generateMetadata({ params, searchParams }) {
             title,
             description: description.substring(0, 150),
             type: 'profile',
-            url: `https://employee-card-os32.vercel.app/card/${id}?template=${template}`,
+            url: imageUrl,
             siteName: 'Digital Business Cards',
             locale: 'en_US',
             profile: {
@@ -122,6 +122,7 @@ export async function generateMetadata({ params, searchParams }) {
             creator: cardData.twitter 
                 ? `@${cardData.twitter.replace('@', '').split('/').pop()}`
                 : fullName,
+            images: [imageUrl],
         },
         
         // Additional metadata
@@ -139,7 +140,7 @@ export async function generateMetadata({ params, searchParams }) {
         
         // Additional meta tags
         alternates: {
-            canonical: `https://employee-card-os32.vercel.app/card/${id}`,
+            canonical:imageUrl,
         },
     };
 }
@@ -205,7 +206,6 @@ const stripHtml = (html) => {
                 <div className="flex items-center justify-center min-h-screen">
                     <div className="flex flex-col items-center gap-4">
                         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-                        <p className="text-gray-600">Loading card...</p>
                     </div>
                 </div>
             }>
