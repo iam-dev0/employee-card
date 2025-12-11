@@ -104,7 +104,13 @@ export async function generateMetadata({ params, searchParams }) {
             title,
             description: description.substring(0, 150),
             type: 'profile',
-            url: imageUrl,
+            url: `https://employee-card-os32.vercel.app/card/${id}/?template=${template}`,
+            images: [{
+                url: imageUrl.toString(),
+                width: 1200,
+                height: 630,
+                alt: `${fullName}'s Digital Business Card`,
+            }],
             siteName: 'Digital Business Cards',
             locale: 'en_US',
             profile: {
@@ -122,7 +128,7 @@ export async function generateMetadata({ params, searchParams }) {
             creator: cardData.twitter 
                 ? `@${cardData.twitter.replace('@', '').split('/').pop()}`
                 : fullName,
-            images: [imageUrl],
+            images: [imageUrl.toJSON()],
         },
         
         // Additional metadata
