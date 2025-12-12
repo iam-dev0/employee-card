@@ -3,28 +3,148 @@ import { Suspense } from 'react';
 import CardViewer from '@/components//card-viewer';
 import { notFound } from 'next/navigation';
 
-// Fetch data server-side
+// Fetch employee data
+async function fetchEmployeeData(id) {
+    const response = await fetch(
+        `${process.env.NEXT_PUBLIC_COMPANY_API_URL}/employee/digitalBusinessCard/${id}`,
+        { next: { revalidate: 3600 } }
+    );
+    if (!response.ok) return null;
+    return response.json();
+}
+
+// Fetch company data
+async function fetchCompanyData(ownerId) {
+    const response = await fetch(
+        `${process.env.NEXT_PUBLIC_COMPANY_API_URL}/companies/${ownerId}`,
+        { next: { revalidate: 3600 } }
+    );
+    if (!response.ok) return null;
+    return response.json();
+}
+
+// Fetch company settings
+async function fetchCompanySettings(ownerId) {
+    const response = await fetch(
+        `${process.env.NEXT_PUBLIC_COMPANY_API_URL}/companies/${ownerId}/company-settings/`,
+        { next: { revalidate: 3600 } }
+    );
+    if (!response.ok) return null;
+    return response.json();
+}
+
+// Fetch employee role/function
+async function fetchEmployeeRole(organisationFunctionId) {
+    const response = await fetch(
+        `${process.env.NEXT_PUBLIC_COMPANY_API_URL}/functions/digitalBusinessCard/${organisationFunctionId}`,
+        { next: { revalidate: 3600 } }
+    );
+    if (!response.ok) return null;
+    return response.json();
+}
+
+// Fetch all data and merge into single object
 async function getCardData(id) {
     try {
-        console.log('Fetching card data for ID:', id);
-        const response = await fetch(
-            `${process.env.NEXT_PUBLIC_COMPANY_API_URL}/employee/digitalBusinessCard/${id}`,
-            {
-                // Enable ISR (Incremental Static Regeneration) for better performance
-                next: { revalidate: 3600 } // Revalidate every hour
-            }
-        );
+        // Step 1: Fetch employee data
+        const employeeData = await fetchEmployeeData(id);
         
-        console.log('Response status:', response.status);
-        
-        if (!response.ok) {
-            console.error('Failed to fetch card data:', response.statusText);
+        if (!employeeData) {
+            console.error('Failed to fetch employee data');
             return null;
         }
         
-        const data = await response.json();
-        console.log('Card data fetched successfully:', !!data);
-        return data;
+        const { ownerId, organisationFunctionId } = employeeData;
+        
+        // Step 2: Fetch company data, company settings, and role in parallel
+        const [companyData, companySettings, roleData] = await Promise.all([
+            ownerId ? fetchCompanyData(ownerId) : null,
+            ownerId ? fetchCompanySettings(ownerId) : null,
+            organisationFunctionId ? fetchEmployeeRole(organisationFunctionId) : null
+        ]);
+        
+        // Step 3: Determine role title based on language preference
+        const mainLanguage = companyData?.mainLanguage || 'DE';
+        let roleTitle = '';
+        if (roleData) {
+            roleTitle = roleData[`title${mainLanguage}`] || roleData.titleDE || roleData.titleEN || roleData.titleFR || roleData.titleIT || '';
+        }
+        
+        // Step 4: Get company address
+        const companyAddress = companyData?.address || companyData?.adresse || {};
+        const formattedAddress = companyAddress.street 
+            ? `${companyAddress.street} ${companyAddress.streetNumber || ''}, ${companyAddress.zip || ''} ${companyAddress.city || ''}`.trim()
+            : '';
+        
+        // Step 5: Get company colors from settings
+        const colors = companySettings?.colors || {};
+        
+        // Step 6: Get company weblinks
+        const weblinks = companyData?.weblinks || {};
+        const weblinkItems = weblinks.weblinksItems || [];
+        const linkedinItem = weblinkItems.find(item => item.url?.includes('linkedin'));
+        
+        // Step 7: Merge all data into single object
+        const mergedData = {
+            // Employee data
+            id: employeeData.id,
+            firstname: employeeData.firstname,
+            name: employeeData.name,
+            image: employeeData.image,
+            email: employeeData.email || companyData?.email,
+            phone: employeeData.phone || companyData?.telefon,
+            linkedin: employeeData.linkedin || linkedinItem?.url || '',
+            visibility: employeeData.visibility,
+            sloganDE: employeeData.sloganDE,
+            sloganFR: employeeData.sloganFR,
+            sloganIT: employeeData.sloganIT,
+            sloganEN: employeeData.sloganEN,
+            aboutDE: employeeData.aboutDE,
+            aboutFR: employeeData.aboutFR,
+            aboutIT: employeeData.aboutIT,
+            aboutEN: employeeData.aboutEN,
+            
+            // Role
+            role: roleTitle,
+            
+            // Company data
+            companyName: companyData?.company || '',
+            companyLogo: companyData?.image || '',
+            website: weblinks.website || companyData?.website || '',
+            bookingLink: weblinks.bookingLink || companyData?.bookingLink || '',
+            vrTour: weblinks.vrTour || null,
+            
+            // Company address for footer
+            footerCompany: companyData?.company || '',
+            footerAddress: formattedAddress,
+            footerEmail: companyData?.email || '',
+            footerPhone: companyData?.telefon || '',
+            
+            // Company colors
+            colors: {
+                primaryColor: colors.primaryColor || '#ffffff',
+                secondaryColor: colors.secondaryColor || '#85c4ff',
+                backgroundColor: colors.backgroundColor || '#455fac',
+                accentColor: colors.accentColor || '#5cffec',
+                contrastColor: colors.contrastColor || '#9EACEFFF',
+                textColor: colors.textColor || '#f5f5f5'
+            },
+            
+            // Additional company info
+            openingHours: companyData?.openingHours || null,
+            mainLanguage: mainLanguage,
+            
+            // Raw data for reference if needed
+            _raw: {
+                employee: employeeData,
+                company: companyData,
+                settings: companySettings,
+                role: roleData
+            }
+        };
+        
+        console.log('Merged card data created successfully');
+        return mergedData;
     } catch (error) {
         console.error('Error fetching card data:', error);
         return null;
@@ -212,16 +332,16 @@ const stripHtml = (html) => {
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
             />
-            
+{/*             
             <Suspense fallback={
                 <div className="flex items-center justify-center min-h-screen">
                     <div className="flex flex-col items-center gap-4">
                         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
                     </div>
                 </div>
-            }>
+            }> */}
                 <CardViewer data={cardData} template={template} cardId={id} />
-            </Suspense>
+            {/* </Suspense> */}
         </main>
     );
 }

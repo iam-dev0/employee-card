@@ -40,7 +40,7 @@ export async function GET(request) {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            background: '#455fac',
+                            background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
                             color: 'white',
                             fontSize: '48px',
                             fontFamily: 'system-ui',
@@ -59,11 +59,7 @@ export async function GET(request) {
         const email = cardData.email || '';
         const phone = cardData.phone || '';
         const address = cardData.address || '';
-        const logo = await fetch(new URL("../../../../assets/app-icon.png", import.meta.url)).then((res) => res.arrayBuffer())
-        const emailIcon = await fetch(new URL("../../../../assets/app-icon.png", import.meta.url)).then((res) => res.arrayBuffer())
-        const phoneIcon = await fetch(new URL("../../../../assets/app-icon.png", import.meta.url)).then((res) => res.arrayBuffer())
-        const linkedinIcon = await fetch(new URL("../../../../assets/app-icon.png", import.meta.url)).then((res) => res.arrayBuffer())
-        // Extract LinkedIn username from URL
+
         const getLinkedInHandle = (linkedinUrl) => {
             if (!linkedinUrl) return null;
             const match = linkedinUrl.match(/linkedin\.com\/in\/([^\/\?]+)/);
@@ -79,187 +75,148 @@ export async function GET(request) {
                         height: '100%',
                         width: '100%',
                         display: 'flex',
-                        fontFamily: 'system-ui',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        // alignItems: 'center',
+                        fontFamily: '"Segoe UI", system-ui, -apple-system, sans-serif',
+                        background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
                     }}
                 >
-                    {/* Left Column - Light Background */}
+                    {/* Left Section - Name & Role */}
                     <div
                         style={{
-                            width: '45%',
-                            background: '#455fac',
                             display: 'flex',
                             flexDirection: 'column',
-                            alignItems: 'center',
                             justifyContent: 'center',
-                            padding: '60px 40px',
+                            padding: '20px 50px',
+                             borderBottom: '1px solid #334155',
                         }}
                     >
-                        {/* Logo Icon */}
                         <div
                             style={{
-                                width: '180px',
-                                height: '180px',
-                                borderRadius: '50%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                marginBottom: '10px',
-                                border: '8px solid #455fac',
-                                fontSize: '72px',
-                                fontWeight: 'bold',
-                                color: '#455fac',
-                            }}
-                        >
-                            <img src={logo} alt="Logo" style={{ width: '100%', height: '100%' }} />
-                        </div>
-
-                        {/* Company Name */}
-                        <div
-                            style={{
-                                fontSize: '42px',
-                                fontWeight: 'bold',
-                                color: '#ffffff',
-                                textAlign: 'center',
-                                marginBottom: '16px',
+                                fontSize: '18px',
+                                color: '#64748b',
+                                fontWeight: '600',
+                                letterSpacing: '2px',
                                 textTransform: 'uppercase',
-                                letterSpacing: '1px',
+                                marginBottom: '20px',
                             }}
                         >
-                            {company || 'YOUR COMPANY'}
+                            {company}
                         </div>
 
-                        {/* Tagline */}
+                        <div
+                            style={{
+                                fontSize: '64px',
+                                fontWeight: '700',
+                                color: '#ffffff',
+                                lineHeight: '1',
+                                marginBottom: '24px',
+                                letterSpacing: '-1px',
+                                width: '100%',
+                            }}
+                        >
+                            {fullName}
+                        </div>
+
                         <div
                             style={{
                                 fontSize: '24px',
-                                color: '#455fac',
-                                textAlign: 'center',
-                                fontWeight: '500',
+                                color: '#94a3b8',
+                                fontWeight: '400',
+                                letterSpacing: '0.5px',
                             }}
                         >
-                            {cardData.tagline || 'YOUR TAGLINE'}
+                            {role}
                         </div>
                     </div>
-
-                    {/* Right Column - Blue Background */}
+                    {/* Right Section - Contact Info */}
                     <div
                         style={{
-                            width: '55%',
-                            background: '#455fac',
                             display: 'flex',
                             flexDirection: 'column',
                             justifyContent: 'center',
                             padding: '60px 50px',
                         }}
                     >
-                        {/* Name */}
-                        <div
-                            style={{
-                                fontSize: '56px',
-                                fontWeight: 'bold',
-                                color: '#ffffff',
-                                lineHeight: '1.1',
-                                marginBottom: '16px',
-                                textTransform: 'uppercase',
-                                letterSpacing: '1px',
-                            }}
-                        >
-                            {fullName || 'YOUR NAME'}
-                        </div>
-
-                        {/* Role */}
-                        <div
-                            style={{
-                                fontSize: '28px',
-                                color: '#d0e0ff',
-                                marginBottom: '48px',
-                                fontWeight: '400',
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.5px',
-                            }}
-                        >
-                            {role || 'MANAGING DIRECTOR'}
-                        </div>
-
-                        {/* Contact Information */}
                         <div
                             style={{
                                 display: 'flex',
                                 flexDirection: 'column',
-                                gap: '20px',
+                                gap: '24px',
                             }}
                         >
-                            {/* Address */}
                             {address && (
                                 <div
                                     style={{
-                                        fontSize: '22px',
-                                        color: '#ffffff',
+                                        fontSize: '24px',
+                                        color: '#e2e8f0',
                                         display: 'flex',
                                         alignItems: 'flex-start',
+                                        gap: '16px',
                                     }}
                                 >
-                                    <span style={{ marginRight: '16px', fontSize: '28px' }}>📍</span>
+                                    <span style={{ fontSize: '24px', minWidth: '24px' }}>📍</span>
                                     <span style={{ lineHeight: '1.4' }}>{address}</span>
                                 </div>
                             )}
 
-                            {/* Email */}
                             {email && (
                                 <div
                                     style={{
-                                        fontSize: '22px',
-                                        color: '#ffffff',
+                                        fontSize: '28px',
+                                        color: '#e2e8f0',
                                         display: 'flex',
                                         alignItems: 'center',
+                                        gap: '16px',
                                     }}
                                 >
-                                    <span style={{ marginRight: '16px', fontSize: '28px', borderRadius: '50%', backgroundColor: '#ffffffff', padding: '10px' }}><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#455fac" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="lucide lucide-mail-icon lucide-mail"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7" /><rect x="2" y="4" width="20" height="16" rx="2" /></svg></span>
+                                    <span style={{ fontSize: '24px' }}>✉️</span>
                                     {email}
                                 </div>
                             )}
 
-                            {/* Phone */}
                             {phone && (
                                 <div
                                     style={{
-                                        fontSize: '22px',
-                                        color: '#ffffff',
+                                        fontSize: '28px',
+                                        color: '#e2e8f0',
                                         display: 'flex',
                                         alignItems: 'center',
+                                        gap: '16px',
                                     }}
                                 >
-                                    <span style={{ marginRight: '16px', fontSize: '28px', borderRadius: '50%', backgroundColor: '#ffffffff', padding: '10px' }}><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#455fac" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="lucide lucide-phone-icon lucide-phone"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384" /></svg></span>
+                                    <span style={{ fontSize: '24px' }}>📞</span>
                                     {phone}
                                 </div>
                             )}
 
-                            {/* LinkedIn */}
                             {linkedinHandle && (
                                 <div
                                     style={{
-                                        fontSize: '22px',
-                                        color: '#d0e0ff',
+                                        fontSize: '28px',
+                                        color: '#e2e8f0',
                                         display: 'flex',
                                         alignItems: 'center',
+                                        gap: '16px',
                                     }}
                                 >
-                                    <span style={{ marginRight: '16px', fontSize: '28px', borderRadius: '50%', backgroundColor: '#ffffffff', padding: '10px' }}><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#455fac" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="lucide lucide-linkedin-icon lucide-linkedin"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" /><rect width="4" height="12" x="2" y="9" /><circle cx="4" cy="4" r="2" /></svg></span>
+                                    <span style={{ fontSize: '24px' }}>🔗</span>
                                     {linkedinHandle}
                                 </div>
                             )}
 
-                            {/* Website */}
                             {cardData.website && (
                                 <div
                                     style={{
-                                        fontSize: '22px',
-                                        color: '#ffffff',
+                                        fontSize: '28px',
+                                        color: '#e2e8f0',
                                         display: 'flex',
                                         alignItems: 'center',
+                                        gap: '16px',
                                     }}
                                 >
-                                    <span style={{ marginRight: '16px', fontSize: '28px' }}>🌐</span>
+                                    <span style={{ fontSize: '24px' }}>🌐</span>
                                     {cardData.website.replace(/^https?:\/\//, '')}
                                 </div>
                             )}
@@ -283,7 +240,7 @@ export async function GET(request) {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        background: '#455fac',
+                        background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
                         color: 'white',
                         fontSize: '48px',
                         fontFamily: 'system-ui',
