@@ -2,26 +2,20 @@ import { motion } from "framer-motion";
 import { QRCodeSVG } from 'qrcode.react';
 import { forwardRef, useState } from 'react';
 
-const Home = forwardRef(({ data, shareWebsite, downloadPDF }, ref) => {
+const Home = forwardRef(({ data, shareWebsite, downloadPDF, loading }, ref) => {
     const [isDownloading, setIsDownloading] = useState(false);
     const [isSharing, setIsSharing] = useState(false);
 
     const handleDownload = async () => {
-        setIsDownloading(true);
-        try {
-            await downloadPDF();
-        } finally {
-            setIsDownloading(false);
-        }
+
+        await downloadPDF();
+
     };
 
     const handleShare = async () => {
-        setIsSharing(true);
-        try {
-            await shareWebsite();
-        } finally {
-            setIsSharing(false);
-        }
+
+        await shareWebsite();
+
     };
 
     const {
@@ -54,7 +48,7 @@ const Home = forwardRef(({ data, shareWebsite, downloadPDF }, ref) => {
     const qrLink = qrCodeLink || (typeof window !== 'undefined' ? window.location.href : '');
 
     return (
-        <div ref={ref} className="h-[100dvh] bg-[#1c1c1c] text-foreground overflow-x-hidden selection:bg-[#A3B5A5] selection:text-black font-sans">
+        <div ref={ref} className="h-full bg-[#1c1c1c] text-foreground overflow-x-hidden selection:bg-[#A3B5A5] selection:text-black font-sans">
             {/* Navigation */}
             <nav className="fixed top-0 w-full z-50 px-6 py-6 flex justify-between items-center mix-blend-exclusion text-white">
                 <div className="flex flex-col">
@@ -75,7 +69,7 @@ const Home = forwardRef(({ data, shareWebsite, downloadPDF }, ref) => {
             </nav>
 
             {/* Hero Section */}
-            <section className="relative h-[100dvh] w-full bg-[#1c1c1c] overflow-hidden flex flex-col justify-end pt-24 pb-8 px-4 md:px-12">
+            <section className="relative h-[800px] md:h-[900px] lg:h-[1000px] w-full bg-[#1c1c1c] overflow-hidden flex flex-col justify-end pt-24 pb-8 px-4 md:px-12">
 
                 {/* Image - Background / Behind Text */}
                 <div className="absolute inset-0 z-0 flex items-end justify-center">
@@ -84,8 +78,9 @@ const Home = forwardRef(({ data, shareWebsite, downloadPDF }, ref) => {
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{ duration: 1 }}
                         src={image}
+                        style={{ objectFit: "cover", objectPosition: "center" }}
                         alt={`${firstName} ${lastName}`}
-                        className="h-full sm:w-full md:w-full lg:w-auto object-cover object-center md:object-top"
+                        className="h-full sm:w-full md:w-full lg:w-auto md:object-top"
                     />
                     {/* Gradient overlay to ensure text readability if needed, though usually requested without for this specific style */}
                     <div className="absolute inset-0 bg-black/20" />
@@ -232,12 +227,30 @@ const Home = forwardRef(({ data, shareWebsite, downloadPDF }, ref) => {
 
                             </div>
 
-                            
+
                         </div>
                     </div>
                 </div>
             </section>
-
+            <div className="h-[430px]">
+                <div className="flex items-end justify-center h-full">
+                    <motion.img
+                        initial={{ scale: 1.1, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ duration: 1 }}
+                        style={{
+                            ...(window.innerWidth < 540 && {
+                                objectFit: "cover",
+                                objectPosition: "bottom"
+                            })
+                        }}
+                        src={image}
+                        alt={`${firstName} ${lastName}`}
+                        className="h-full w-auto"
+                    />
+                    {/* Gradient overlay to ensure text readability if needed, though usually requested without for this specific style */}
+                </div>
+            </div>
             {/* QR Code Feature Section */}
             {qrLink && <section className="py-20 bg-gradient-to-b from-[#161616] to-[#0f0f0f] relative z-20 border-t border-white/5">
                 <div className="container mx-auto px-6">
@@ -270,7 +283,7 @@ const Home = forwardRef(({ data, shareWebsite, downloadPDF }, ref) => {
                             </p>
                         </motion.div>
                     </div>
-                     <div className="flex flex-col items-center text-center space-y-8 max-w-2xl mx-auto">
+                    <div className="flex flex-col items-center text-center space-y-8 max-w-2xl mx-auto">
                         <motion.div
                             initial={{ opacity: 0, scale: 0.8 }}
                             whileInView={{ opacity: 1, scale: 1 }}
@@ -279,15 +292,15 @@ const Home = forwardRef(({ data, shareWebsite, downloadPDF }, ref) => {
                             className="relative mt-8 flex items-center justify-center gap-4"
                         >
                             {(shareWebsite || downloadPDF) && (
-<div className="mt-8 flex items-center justify-center gap-4">
+                                <div className="mt-8 flex items-center justify-center gap-4">
                                     {downloadPDF && (
                                         <div className="group relative">
                                             <button
                                                 onClick={handleDownload}
-                                                disabled={isDownloading}
+                                                disabled={loading}
                                                 className="cursor-pointer flex items-center justify-center w-14 h-14 bg-[#A3B5A5]/20 backdrop-blur-sm text-[#A3B5A5] hover:bg-[#A3B5A5]/30 transition-all duration-300 border border-[#A3B5A5]/30 hover:border-[#A3B5A5] hover:scale-110 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
                                             >
-                                                {isDownloading ? (
+                                                {loading ? (
                                                     <svg className="animate-spin h-6 w-6" viewBox="0 0 24 24">
                                                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                                                         <path className="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
@@ -299,7 +312,7 @@ const Home = forwardRef(({ data, shareWebsite, downloadPDF }, ref) => {
                                                 )}
                                             </button>
                                             <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-black/80 backdrop-blur-sm text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap">
-                                                {isDownloading ? 'Downloading...' : 'Download PDF'}
+                                                {loading ? 'Downloading...' : 'Download PDF'}
                                             </div>
                                         </div>
                                     )}
@@ -331,7 +344,7 @@ const Home = forwardRef(({ data, shareWebsite, downloadPDF }, ref) => {
                             )}
                         </motion.div>
                     </div>
-                   
+
                 </div>
             </section>}
 

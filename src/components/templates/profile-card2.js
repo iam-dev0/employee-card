@@ -1,26 +1,13 @@
 import { QRCodeSVG } from 'qrcode.react';
 import { forwardRef, useState } from 'react';
 
-const ProfileCard7 = forwardRef(({ data, shareWebsite, downloadPDF }, ref) => {
-  const [isDownloading, setIsDownloading] = useState(false);
-  const [isSharing, setIsSharing] = useState(false);
-
+const ProfileCard7 = forwardRef(({ data, shareWebsite, downloadPDF, loading }, ref) => {
   const handleDownload = async () => {
-    setIsDownloading(true);
-    try {
       await downloadPDF();
-    } finally {
-      setIsDownloading(false);
-    }
   };
 
   const handleShare = async () => {
-    setIsSharing(true);
-    try {
       await shareWebsite();
-    } finally {
-      setIsSharing(false);
-    }
   };
   const {
     firstname: firstName = 'Kevin',
@@ -81,14 +68,14 @@ const ProfileCard7 = forwardRef(({ data, shareWebsite, downloadPDF }, ref) => {
             {/* Download Icon */}
             <button
               onClick={handleDownload}
-              disabled={isDownloading}
+              disabled={loading}
               className="relative group cursor-pointer w-8 h-8 rounded-full bg-white/10 hover:bg-[#e64a19] text-white flex items-center justify-center transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
               title="Download PDF"
             >
-              {isDownloading ? (
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              {loading ? (
+                <div className="w-4 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
               ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="lucide lucide-download-icon lucide-download"><path d="M12 15V3" /><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><path d="m7 10 5 5 5-5" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="lucide lucide-download-icon lucide-download"><path d="M12 15V3" /><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><path d="m7 10 5 5 5-5" /></svg>
 
               )}
             </button>
@@ -96,16 +83,11 @@ const ProfileCard7 = forwardRef(({ data, shareWebsite, downloadPDF }, ref) => {
             {/* Share Icon */}
             <button
               onClick={handleShare}
-              disabled={isSharing}
               className="relative group cursor-pointer w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm"
             >
-              {isSharing ? (
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-              ) : (
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
                 </svg>
-              )}
             </button>
           </div>
           {/* Mobile Menu Icon (Visible only on mobile) */}
@@ -154,7 +136,7 @@ const ProfileCard7 = forwardRef(({ data, shareWebsite, downloadPDF }, ref) => {
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute bottom-6 inset-x-0 flex justify-center z-10">
-                  <span className="flex items-center gap-2 text-white/90 font-medium text-[12px] tracking-widest uppercase border border-white/20 px-4 py-1.5 rounded-full bg-black/10 backdrop-blur-sm">
+                  <span className="flex items-center gap-2 text-white/90 font-medium text-[12px] tracking-widest uppercase border border-white/20 px-4 py-1.5 rounded-full bg-[#0f3227]/50 backdrop-blur-sm">
                     {/* {companyLogo ? (
                       <img src={companyLogo} alt="Logo" className="w-8 h-8 object-contain" />
                     ) : (

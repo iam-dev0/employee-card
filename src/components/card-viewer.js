@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import html2canvas from 'html2canvas-pro';
 import { jsPDF } from 'jspdf';
 import ProfileCard3 from './templates/profile-card1';
@@ -14,13 +14,13 @@ const TEMPLATES = [
 ];
 
 const CardViewer = ({ data, template = 'glass', cardId }) => {
+    const [isGenerating, setIsGenerating] = useState(false); // isGenerating state can be used if needed
     const SelectedTemplate = TEMPLATES.find(t => t.id === template)?.component || ProfileCard3;
     const cardRef = useRef(null);
    const downloadPDF = () => {
         const element = cardRef.current;
-        if (element) return;
-        
-        // setIsGenerating(true);
+        if (!element) return;
+        setIsGenerating(true);
         html2canvas(element, {
             scale: 2,
             useCORS: true,
@@ -34,7 +34,10 @@ const CardViewer = ({ data, template = 'glass', cardId }) => {
             windowHeight: element.scrollHeight,
             x: 0,
             y: 0,
-            removeContainer: true
+            removeContainer: false,
+            foreignObjectRendering: false,
+            logging: false,
+            imageTimeout: 0
         }).then(canvas => {
             const imgData = canvas.toDataURL('image/png', 0.98);
             
@@ -69,11 +72,11 @@ const CardViewer = ({ data, template = 'glass', cardId }) => {
             
             pdf.addImage(imgData, 'PNG', xOffset, yOffset, imgWidth, imgHeight);
             pdf.save(`${data?.firstName || 'Card'} ${data?.lastName || new Date().toISOString().split('T')[0]} Card.pdf`);
-            // setIsGenerating(false);
+            setIsGenerating(false);
         }).catch(error => {
             console.error('Error generating PDF:', error);
             alert('Failed to generate PDF. Please try again.');
-            // setIsGenerating(false);
+            setIsGenerating(false);
         });
     };
     const shareWebsite = () => {
@@ -103,7 +106,7 @@ const CardViewer = ({ data, template = 'glass', cardId }) => {
     }
     return (
             <div className="w-full h-full">
-                <SelectedTemplate data={data} shareWebsite={shareWebsite} ref={cardRef} downloadPDF={downloadPDF} />
+                <SelectedTemplate data={data} shareWebsite={shareWebsite} ref={cardRef} downloadPDF={downloadPDF} loading={isGenerating} />
             </div>
     );
 };

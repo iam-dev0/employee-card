@@ -2,26 +2,20 @@
 import { QRCodeSVG } from 'qrcode.react';
 import { forwardRef, useState } from 'react';
 
-const ProfileCard8 = forwardRef(({ data, shareWebsite, downloadPDF }, ref) => {
+const ProfileCard8 = forwardRef(({ data, shareWebsite, downloadPDF,loading }, ref) => {
   const [isDownloading, setIsDownloading] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
 
   const handleDownload = async () => {
-    setIsDownloading(true);
-    try {
+   
       await downloadPDF();
-    } finally {
-      setIsDownloading(false);
-    }
+    
   };
 
   const handleShare = async () => {
-    setIsSharing(true);
-    try {
+   
       await shareWebsite();
-    } finally {
-      setIsSharing(false);
-    }
+    
   };
     const {
         firstname: firstName = 'Linda',
@@ -108,7 +102,7 @@ const ProfileCard8 = forwardRef(({ data, shareWebsite, downloadPDF }, ref) => {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex items-center gap-2 mb-8 lg:mb-12">
+                    <div className="flex flex-wrap items-center gap-2 mb-8 lg:mb-12">
                         {/* Desktop Primary Contact Button */}
                         {phone && (
                             <a href={`tel:${phone}`} className="group flex h-14 px-10 rounded-2xl bg-white/5 backdrop-blur-sm text-white items-center justify-center gap-3 hover:bg-white/20 transition-all ">
@@ -116,10 +110,7 @@ const ProfileCard8 = forwardRef(({ data, shareWebsite, downloadPDF }, ref) => {
                                 <span className="font-semibold text-lg">Contact Me</span>
                             </a>
                         )}
-
-                        {/* Secondary Action Buttons */}
-                        <div className="flex items-center gap-2">
-                            {email && (
+ {email && (
                                 <a href={`mailto:${email}`} className="group w-14 h-14 rounded-2xl bg-white/5 backdrop-blur-sm text-white flex items-center justify-center hover:bg-white/20 transition-all ">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:scale-110 transition-transform duration-300"><rect width="20" height="16" x="2" y="4" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></svg>
                                 </a>
@@ -129,11 +120,11 @@ const ProfileCard8 = forwardRef(({ data, shareWebsite, downloadPDF }, ref) => {
                             {downloadPDF && (
                                 <button
                                     onClick={handleDownload}
-                                    disabled={isDownloading}
-                                    title={isDownloading ? 'Downloading...' : 'Download PDF'}
+                                    disabled={loading}
+                                    title={loading ? 'Downloading...' : 'Download PDF'}
                                     className="relative group w-14 h-14 rounded-2xl bg-white/5 backdrop-blur-sm text-white flex items-center justify-center hover:bg-white/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    {isDownloading ? (
+                                    {loading ? (
                                         <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
                                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                                             <path className="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
@@ -143,7 +134,7 @@ const ProfileCard8 = forwardRef(({ data, shareWebsite, downloadPDF }, ref) => {
                                     )}
                                     {/* Tooltip */}
                                     <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs bg-black/80 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
-                                        {isDownloading ? 'Downloading...' : 'Download PDF'}
+                                        {loading ? 'Downloading...' : 'Download PDF'}
                                     </div>
                                 </button>
                             )}
@@ -172,7 +163,6 @@ const ProfileCard8 = forwardRef(({ data, shareWebsite, downloadPDF }, ref) => {
                                     </div>
                                 </button>
                             )}
-                        </div>
                     </div>
 
                     {/* Links / Contact Information */}
